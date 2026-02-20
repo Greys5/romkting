@@ -35,10 +35,10 @@ jobs:
           npx vercel env add GOOGLE_CLIENT_SECRET   "${{ secrets.GOOGLE_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
           npx vercel env add LINKEDIN_CLIENT_ID     "${{ secrets.LINKEDIN_CLIENT_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
           npx vercel env add LINKEDIN_CLIENT_SECRET "${{ secrets.LINKEDIN_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add META_APP_ID            "${{ secrets.META_APP_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add META_APP_SECRET        "${{ secrets.META_APP_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add HUBSPOT_CLIENT_ID      "${{ secrets.HUBSPOT_CLIENT_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add HUBSPOT_CLIENT_SECRET  "${{ secrets.HUBSPOT_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          # npx vercel env add META_APP_ID            "${{ secrets.META_APP_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          # npx vercel env add META_APP_SECRET        "${{ secrets.META_APP_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          # npx vercel env add HUBSPOT_CLIENT_ID      "${{ secrets.HUBSPOT_CLIENT_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          # npx vercel env add HUBSPOT_CLIENT_SECRET  "${{ secrets.HUBSPOT_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
           npx vercel env add SESSION_SECRET         "${{ secrets.SESSION_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
 
       - name: Deploy to Vercel
