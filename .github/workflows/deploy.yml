@@ -26,9 +26,20 @@ jobs:
 
       - name: Link Vercel project
         run: npx vercel link --token=${{ secrets.VERCEL_TOKEN }} --yes
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Sync env vars to Vercel
+        run: |
+          npx vercel env add NEXT_PUBLIC_APP_URL    "${{ secrets.NEXT_PUBLIC_APP_URL }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          npx vercel env add ANTHROPIC_API_KEY      "${{ secrets.ANTHROPIC_API_KEY }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          npx vercel env add GOOGLE_CLIENT_ID       "${{ secrets.GOOGLE_CLIENT_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          npx vercel env add GOOGLE_CLIENT_SECRET   "${{ secrets.GOOGLE_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          npx vercel env add LINKEDIN_CLIENT_ID     "${{ secrets.LINKEDIN_CLIENT_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          npx vercel env add LINKEDIN_CLIENT_SECRET "${{ secrets.LINKEDIN_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          # npx vercel env add META_APP_ID            "${{ secrets.META_APP_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          # npx vercel env add META_APP_SECRET        "${{ secrets.META_APP_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          # npx vercel env add HUBSPOT_CLIENT_ID      "${{ secrets.HUBSPOT_CLIENT_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          # npx vercel env add HUBSPOT_CLIENT_SECRET  "${{ secrets.HUBSPOT_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          npx vercel env add SESSION_SECRET         "${{ secrets.SESSION_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
 
       - name: Deploy to Vercel
         run: npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
