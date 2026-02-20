@@ -192,11 +192,13 @@ export default function App() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem", margin: "3rem 0", maxWidth: "900px" }}>
           {/* Industria */}
-          <div style={{ ...S.cfgCard, cursor: "pointer" }} onClick={() => setUserContext({ ...userContext, industry: "B2B SaaS" })}>
-            <div style={S.cfgTitle}>Industria</div>
-            <div style={{ marginBottom: "1rem", fontSize: "2rem" }}>🏢</div>
+          <div style={S.cfgCard}>
+            <div style={S.cfgTitle}>Tu industria/contexto</div>
+            <input style={{ ...S.cfgInput, marginBottom: "0.8rem" }} placeholder="ej: SaaS EdTech B2B"
+              value={userContext.industry} onChange={(e) => setUserContext({ ...userContext, industry: e.target.value })} />
+            <div style={{ fontSize: "0.7rem", color: "#666" }}>O selecciona una opción:</div>
             {["B2B SaaS", "E-commerce", "Agencia", "B2C"].map(opt => (
-              <label key={opt} style={{ display: "block", marginBottom: "0.6rem", cursor: "pointer", fontSize: "0.85rem" }}>
+              <label key={opt} style={{ display: "block", marginBottom: "0.5rem", cursor: "pointer", fontSize: "0.8rem" }}>
                 <input type="radio" name="industry" checked={userContext.industry === opt} onChange={() => setUserContext({ ...userContext, industry: opt })} />
                 {" " + opt}
               </label>
@@ -205,10 +207,12 @@ export default function App() {
 
           {/* Etapa */}
           <div style={S.cfgCard}>
-            <div style={S.cfgTitle}>Etapa</div>
-            <div style={{ marginBottom: "1rem", fontSize: "2rem" }}>📈</div>
+            <div style={S.cfgTitle}>Etapa / Momento</div>
+            <input style={{ ...S.cfgInput, marginBottom: "0.8rem" }} placeholder="ej: Scaling"
+              value={userContext.stage} onChange={(e) => setUserContext({ ...userContext, stage: e.target.value })} />
+            <div style={{ fontSize: "0.7rem", color: "#666" }}>O selecciona:</div>
             {["Early Stage", "Growth", "Scale"].map(opt => (
-              <label key={opt} style={{ display: "block", marginBottom: "0.6rem", cursor: "pointer", fontSize: "0.85rem" }}>
+              <label key={opt} style={{ display: "block", marginBottom: "0.5rem", cursor: "pointer", fontSize: "0.8rem" }}>
                 <input type="radio" name="stage" checked={userContext.stage === opt} onChange={() => setUserContext({ ...userContext, stage: opt })} />
                 {" " + opt}
               </label>
@@ -218,9 +222,11 @@ export default function App() {
           {/* Métrica principal */}
           <div style={S.cfgCard}>
             <div style={S.cfgTitle}>Métrica principal</div>
-            <div style={{ marginBottom: "1rem", fontSize: "2rem" }}>🎯</div>
+            <input style={{ ...S.cfgInput, marginBottom: "0.8rem" }} placeholder="ej: Conversiones"
+              value={userContext.mainMetric} onChange={(e) => setUserContext({ ...userContext, mainMetric: e.target.value })} />
+            <div style={{ fontSize: "0.7rem", color: "#666" }}>O selecciona:</div>
             {["Leads", "Revenue", "Traffic", "Conversiones"].map(opt => (
-              <label key={opt} style={{ display: "block", marginBottom: "0.6rem", cursor: "pointer", fontSize: "0.85rem" }}>
+              <label key={opt} style={{ display: "block", marginBottom: "0.5rem", cursor: "pointer", fontSize: "0.8rem" }}>
                 <input type="radio" name="metric" checked={userContext.mainMetric === opt} onChange={() => setUserContext({ ...userContext, mainMetric: opt })} />
                 {" " + opt}
               </label>
