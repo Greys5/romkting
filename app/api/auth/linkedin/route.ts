@@ -19,8 +19,8 @@ export async function GET(req: NextRequest) {
       body: new URLSearchParams({
         grant_type:    "authorization_code",
         code,
-        client_id:     process.env.LINKEDIN_CLIENT_ID!,
-        client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
+        client_id:     process.env.LINKEDIN_CLIENT_ID!.trim(),
+        client_secret: process.env.LINKEDIN_CLIENT_SECRET!.trim(),
         redirect_uri:  `${BASE}/api/auth/linkedin`,
       }),
     })
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
   const oauthState = generateOAuthState("linkedin")
   const params = new URLSearchParams({
     response_type: "code",
-    client_id:     process.env.LINKEDIN_CLIENT_ID!,
+    client_id:     process.env.LINKEDIN_CLIENT_ID!.trim(),
     redirect_uri:  `${BASE}/api/auth/linkedin`,
     scope:         "r_liteprofile r_emailaddress r_organization_social rw_organization_admin",
     state:         oauthState,

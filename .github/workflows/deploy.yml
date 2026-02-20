@@ -28,18 +28,26 @@ jobs:
         run: npx vercel link --token=${{ secrets.VERCEL_TOKEN }} --yes
 
       - name: Sync env vars to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          npx vercel env add NEXT_PUBLIC_APP_URL    "${{ secrets.NEXT_PUBLIC_APP_URL }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add ANTHROPIC_API_KEY      "${{ secrets.ANTHROPIC_API_KEY }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add GOOGLE_CLIENT_ID       "${{ secrets.GOOGLE_CLIENT_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add GOOGLE_CLIENT_SECRET   "${{ secrets.GOOGLE_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add LINKEDIN_CLIENT_ID     "${{ secrets.LINKEDIN_CLIENT_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add LINKEDIN_CLIENT_SECRET "${{ secrets.LINKEDIN_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          # npx vercel env add META_APP_ID            "${{ secrets.META_APP_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          # npx vercel env add META_APP_SECRET        "${{ secrets.META_APP_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          # npx vercel env add HUBSPOT_CLIENT_ID      "${{ secrets.HUBSPOT_CLIENT_ID }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          # npx vercel env add HUBSPOT_CLIENT_SECRET  "${{ secrets.HUBSPOT_CLIENT_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
-          npx vercel env add SESSION_SECRET         "${{ secrets.SESSION_SECRET }}" production --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          sync_env() {
+            local key="$1"
+            local value="$2"
+            npx vercel env rm "$key" production --token=$VERCEL_TOKEN --yes 2>/dev/null || true
+            printf '%s' "$value" | npx vercel env add "$key" production --token=$VERCEL_TOKEN
+          }
+          sync_env NEXT_PUBLIC_APP_URL    "${{ secrets.NEXT_PUBLIC_APP_URL }}"
+          sync_env ANTHROPIC_API_KEY      "${{ secrets.ANTHROPIC_API_KEY }}"
+          sync_env GOOGLE_CLIENT_ID       "${{ secrets.GOOGLE_CLIENT_ID }}"
+          sync_env GOOGLE_CLIENT_SECRET   "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          sync_env LINKEDIN_CLIENT_ID     "${{ secrets.LINKEDIN_CLIENT_ID }}"
+          sync_env LINKEDIN_CLIENT_SECRET "${{ secrets.LINKEDIN_CLIENT_SECRET }}"
+          # sync_env META_APP_ID            "${{ secrets.META_APP_ID }}"
+          # sync_env META_APP_SECRET        "${{ secrets.META_APP_SECRET }}"
+          # sync_env HUBSPOT_CLIENT_ID      "${{ secrets.HUBSPOT_CLIENT_ID }}"
+          # sync_env HUBSPOT_CLIENT_SECRET  "${{ secrets.HUBSPOT_CLIENT_SECRET }}"
+          sync_env SESSION_SECRET         "${{ secrets.SESSION_SECRET }}"
 
       - name: Deploy to Vercel
         run: npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
