@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     response_type: "code",
     client_id:     process.env.LINKEDIN_CLIENT_ID!.trim(),
     redirect_uri:  `${BASE}/api/auth/linkedin`,
-    scope:         "r_liteprofile r_emailaddress r_organization_social rw_organization_admin",
+    scope:         "openid profile email",
     state:         oauthState,
   })
   return NextResponse.redirect(`https://www.linkedin.com/oauth/v2/authorization?${params}`)
