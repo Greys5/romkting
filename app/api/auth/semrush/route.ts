@@ -6,9 +6,10 @@
 //   DELETE /api/auth/semrush → borra la cookie (desconectar)
 
 import { NextRequest, NextResponse } from "next/server"
+import { getBaseUrl } from "@/lib/base-url"
 
 const COOKIE = "mbr_semrush_apikey"
-const BASE   = process.env.NEXT_PUBLIC_APP_URL!
+const BASE   = getBaseUrl()
 
 export async function POST(req: NextRequest) {
   const { apiKey } = await req.json()

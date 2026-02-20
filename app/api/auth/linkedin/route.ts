@@ -1,8 +1,9 @@
 // app/api/auth/linkedin/route.ts
 import { NextRequest, NextResponse } from "next/server"
 import { generateOAuthState, validateOAuthState } from "@/lib/oauth-state"
+import { getBaseUrl } from "@/lib/base-url"
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL!
+const BASE = getBaseUrl()
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)

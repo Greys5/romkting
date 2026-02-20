@@ -1,8 +1,9 @@
 // app/api/auth/meta/route.ts
 import { NextRequest, NextResponse } from "next/server"
 import { generateOAuthState, validateOAuthState } from "@/lib/oauth-state"
+import { getBaseUrl } from "@/lib/base-url"
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+const BASE = getBaseUrl()
 
 export async function GET(req: NextRequest) {
   if (!process.env.META_APP_ID || !process.env.META_APP_SECRET) {

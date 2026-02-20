@@ -2,8 +2,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { generateOAuthState, validateOAuthState } from "@/lib/oauth-state"
 import { setTokenCookie } from "@/lib/session"
+import { getBaseUrl } from "@/lib/base-url"
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL!
+const BASE = getBaseUrl()
 
 // Scopes per product — user only grants what they need
 const SCOPE_MAP: Record<string, string[]> = {

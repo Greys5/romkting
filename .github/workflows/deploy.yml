@@ -37,7 +37,6 @@ jobs:
             npx vercel env rm "$key" production --token=$VERCEL_TOKEN --yes 2>/dev/null || true
             printf '%s' "$value" | npx vercel env add "$key" production --token=$VERCEL_TOKEN
           }
-          sync_env NEXT_PUBLIC_APP_URL    "${{ secrets.NEXT_PUBLIC_APP_URL }}"
           sync_env ANTHROPIC_API_KEY      "${{ secrets.ANTHROPIC_API_KEY }}"
           sync_env GOOGLE_CLIENT_ID       "${{ secrets.GOOGLE_CLIENT_ID }}"
           sync_env GOOGLE_CLIENT_SECRET   "${{ secrets.GOOGLE_CLIENT_SECRET }}"
