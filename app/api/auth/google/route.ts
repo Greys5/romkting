@@ -4,8 +4,6 @@ import { generateOAuthState, validateOAuthState } from "@/lib/oauth-state"
 import { setTokenCookie } from "@/lib/session"
 import { getBaseUrl } from "@/lib/base-url"
 
-const BASE = getBaseUrl()
-
 // Scopes per product — user only grants what they need
 const SCOPE_MAP: Record<string, string[]> = {
   gsc: [
@@ -31,6 +29,7 @@ const SCOPE_MAP: Record<string, string[]> = {
 // GET /api/auth/google?scope=gsc  → redirects to Google consent screen
 // GET /api/auth/google?code=...   → handles callback from Google
 export async function GET(req: NextRequest) {
+  const BASE = getBaseUrl()
   const { searchParams } = new URL(req.url)
   const scope = searchParams.get("scope") ?? "all"
   const code  = searchParams.get("code")

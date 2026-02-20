@@ -3,9 +3,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { generateOAuthState, validateOAuthState } from "@/lib/oauth-state"
 import { getBaseUrl } from "@/lib/base-url"
 
-const BASE = getBaseUrl()
-
 export async function GET(req: NextRequest) {
+  const BASE = getBaseUrl()
   if (!process.env.META_APP_ID || !process.env.META_APP_SECRET) {
     return NextResponse.json({ error: "Meta not configured" }, { status: 503 })
   }

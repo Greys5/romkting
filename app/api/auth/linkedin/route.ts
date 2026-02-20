@@ -3,9 +3,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { generateOAuthState, validateOAuthState } from "@/lib/oauth-state"
 import { getBaseUrl } from "@/lib/base-url"
 
-const BASE = getBaseUrl()
-
 export async function GET(req: NextRequest) {
+  const BASE = getBaseUrl()
   const { searchParams } = new URL(req.url)
   const code  = searchParams.get("code")
   const state = searchParams.get("state")
