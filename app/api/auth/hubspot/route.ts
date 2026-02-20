@@ -2,9 +2,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { generateOAuthState, validateOAuthState } from "@/lib/oauth-state"
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL!
+const BASE = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 
 export async function GET(req: NextRequest) {
+  if (!process.env.HUBSPOT_CLIENT_ID || !process.env.HUBSPOT_CLIENT_SECRET) {
+    return NextResponse.json({ error: "HubSpot not configured" }, { status: 503 })
+  }
+
   const { searchParams } = new URL(req.url)
   const code  = searchParams.get("code")
   const state = searchParams.get("state")
@@ -18,8 +22,8 @@ export async function GET(req: NextRequest) {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
         grant_type:    "authorization_code",
-        client_id:     process.env.HUBSPOT_CLIENT_ID!,
-        client_secret: process.env.HUBSPOT_CLIENT_SECRET!,
+        client_id:     process.env.HUBSPOT_CLIENT_ID,
+        client_secret: process.env.HUBSPOT_CLIENT_SECRET,
         redirect_uri:  `${BASE}/api/auth/hubspot`,
         code,
       }),
@@ -38,7 +42,7 @@ export async function GET(req: NextRequest) {
 
   const oauthState = generateOAuthState("hubspot")
   const params = new URLSearchParams({
-    client_id:     process.env.HUBSPOT_CLIENT_ID!,
+    client_id:     process.env.HUBSPOT_CLIENT_ID,
     redirect_uri:  `${BASE}/api/auth/hubspot`,
     scope:         "crm.objects.contacts.read crm.objects.deals.read marketing-email campaigns",
     state:         oauthState,
