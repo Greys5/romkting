@@ -73,14 +73,32 @@ export default function App() {
   useEffect(() => { sessionStorage.setItem("mbr_step", step) }, [step])
   useEffect(() => { sessionStorage.setItem("mbr_ctx", JSON.stringify(userContext)) }, [userContext])
 
-  const fetchStatus = useCallback(async () => {
+  const fetchStatus = useCallback(async (autoAdvance = false) => {
     const res = await fetch("/api/auth/status")
     const d   = await res.json()
-    setConnected(d.connected ?? {})
+    const newConnected = d.connected ?? {}
+    setConnected(newConnected)
     setLoading(false)
+    // If coming back from OAuth (autoAdvance=true) and something is connected, go to configure
+    if (autoAdvance && Object.values(newConnected).some(Boolean)) {
+      setStep("configure")
+    }
   }, [])
 
-  useEffect(() => { fetchStatus() }, [fetchStatus])
+  // On first load: detect if we're returning from an OAuth flow
+  // If the sessionStorage says we were on "connect", auto-advance to "configure" once connected
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const oauthError = params.get("error")
+    if (oauthError) {
+      window.history.replaceState({}, "", window.location.pathname)
+      fetchStatus()
+    } else {
+      const savedStep = sessionStorage.getItem("mbr_step") as Step
+      const autoAdvance = savedStep === "connect"
+      fetchStatus(autoAdvance)
+    }
+  }, [fetchStatus])
   useEffect(() => {
     const iv = setInterval(fetchStatus, 3000)
     return () => clearInterval(iv)
