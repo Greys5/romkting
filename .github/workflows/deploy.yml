@@ -1,0 +1,54 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Link Vercel project
+        run: npx vercel link --token=${{ secrets.VERCEL_TOKEN }} --yes
+
+      - name: Sync env vars to Vercel
+        run: |
+          sync_env() {
+            local key=$1
+            local value=$2
+            # Eliminar si ya existe (ignora error si no existe)
+            echo "$value" | npx vercel env rm "$key" production --token=${{ secrets.VERCEL_TOKEN }} --yes 2>/dev/null || true
+            # Agregar el valor nuevo
+            echo "$value" | npx vercel env add "$key" production --token=${{ secrets.VERCEL_TOKEN }}
+          }
+
+          sync_env NEXT_PUBLIC_APP_URL    "${{ secrets.NEXT_PUBLIC_APP_URL }}"
+          sync_env ANTHROPIC_API_KEY      "${{ secrets.ANTHROPIC_API_KEY }}"
+          sync_env GOOGLE_CLIENT_ID       "${{ secrets.GOOGLE_CLIENT_ID }}"
+          sync_env GOOGLE_CLIENT_SECRET   "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          sync_env LINKEDIN_CLIENT_ID     "${{ secrets.LINKEDIN_CLIENT_ID }}"
+          sync_env LINKEDIN_CLIENT_SECRET "${{ secrets.LINKEDIN_CLIENT_SECRET }}"
+          sync_env META_APP_ID            "${{ secrets.META_APP_ID }}"
+          sync_env META_APP_SECRET        "${{ secrets.META_APP_SECRET }}"
+          sync_env HUBSPOT_CLIENT_ID      "${{ secrets.HUBSPOT_CLIENT_ID }}"
+          sync_env HUBSPOT_CLIENT_SECRET  "${{ secrets.HUBSPOT_CLIENT_SECRET }}"
+          sync_env SESSION_SECRET         "${{ secrets.SESSION_SECRET }}"
+
+      - name: Deploy to Vercel
+        run: npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
