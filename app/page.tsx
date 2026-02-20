@@ -8,7 +8,7 @@ import { useEffect, useState, useRef, useCallback } from "react"
 import { SOURCES, Source, SourceId } from "@/lib/sources"
 import ReportView from "@/app/components/ReportView"
 
-type Step = "context" | "connect" | "configure" | "report"
+type Step = "connect" | "configure" | "report"
 
 interface NorthStar { label: string; goal: string; real: string }
 
@@ -39,15 +39,10 @@ const DEFAULT_NORTH_STARS: NorthStar[] = [
 export default function App() {
   const [step, setStep]           = useState<Step>(() => {
     if (typeof window !== "undefined") {
-      return (sessionStorage.getItem("mbr_step") as Step) ?? "context"
+      const s = sessionStorage.getItem("mbr_step") as Step
+      return (s === "connect" || s === "configure") ? s : "connect"
     }
-    return "context"
-  })
-  const [userContext, setUserContext] = useState(() => {
-    if (typeof window !== "undefined") {
-      try { return JSON.parse(sessionStorage.getItem("mbr_ctx") ?? "null") ?? { industry: "", stage: "", mainMetric: "" } } catch { }
-    }
-    return { industry: "", stage: "", mainMetric: "" }
+    return "connect"
   })
   const [connected, setConnected] = useState<Record<string, boolean>>({})
   const [loading, setLoading]     = useState(true)
@@ -71,7 +66,6 @@ export default function App() {
   const [srPlanInfo, setSrPlanInfo] = useState<SrPlanInfo | null>(null)
 
   useEffect(() => { sessionStorage.setItem("mbr_step", step) }, [step])
-  useEffect(() => { sessionStorage.setItem("mbr_ctx", JSON.stringify(userContext)) }, [userContext])
 
   const fetchStatus = useCallback(async (autoAdvance = false) => {
     const res = await fetch("/api/auth/status")
@@ -202,83 +196,6 @@ export default function App() {
   )
 
   // ════════════════════════════════════════════════
-  // STEP 0 — CONTEXTO
-  // ════════════════════════════════════════════════
-  if (step === "context") return (
-    <div style={S.page}>
-      <div style={S.topbar}>
-        <span style={S.logo}>MBR<span style={{ color: "#f04b20" }}>.</span></span>
-        <div style={S.stepDots}>
-          <div style={{ ...S.dot, ...S.dotActive }} />
-          <div style={S.dot} />
-          <div style={S.dot} />
-          <div style={S.dot} />
-        </div>
-      </div>
-
-      <div style={S.content}>
-        <div style={S.eyebrow}>Tu contexto</div>
-        <h1 style={S.h1}>¿Sobre qué querés que te interprete?</h1>
-        <p style={S.desc}>Esto ayuda a Claude a contextualizar el análisis de tu industria y objetivos.</p>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem", margin: "3rem 0", maxWidth: "900px" }}>
-          {/* Industria */}
-          <div style={S.cfgCard}>
-            <div style={S.cfgTitle}>Tu industria/contexto</div>
-            <input style={{ ...S.cfgInput, marginBottom: "0.8rem" }} placeholder="ej: SaaS EdTech B2B"
-              value={userContext.industry} onChange={(e) => setUserContext({ ...userContext, industry: e.target.value })} />
-            <div style={{ fontSize: "0.7rem", color: "#666" }}>O selecciona una opción:</div>
-            {["B2B SaaS", "E-commerce", "Agencia", "B2C"].map(opt => (
-              <label key={opt} style={{ display: "block", marginBottom: "0.5rem", cursor: "pointer", fontSize: "0.8rem" }}>
-                <input type="radio" name="industry" checked={userContext.industry === opt} onChange={() => setUserContext({ ...userContext, industry: opt })} />
-                {" " + opt}
-              </label>
-            ))}
-          </div>
-
-          {/* Etapa */}
-          <div style={S.cfgCard}>
-            <div style={S.cfgTitle}>Etapa / Momento</div>
-            <input style={{ ...S.cfgInput, marginBottom: "0.8rem" }} placeholder="ej: Scaling"
-              value={userContext.stage} onChange={(e) => setUserContext({ ...userContext, stage: e.target.value })} />
-            <div style={{ fontSize: "0.7rem", color: "#666" }}>O selecciona:</div>
-            {["Early Stage", "Growth", "Scale"].map(opt => (
-              <label key={opt} style={{ display: "block", marginBottom: "0.5rem", cursor: "pointer", fontSize: "0.8rem" }}>
-                <input type="radio" name="stage" checked={userContext.stage === opt} onChange={() => setUserContext({ ...userContext, stage: opt })} />
-                {" " + opt}
-              </label>
-            ))}
-          </div>
-
-          {/* Métrica principal */}
-          <div style={S.cfgCard}>
-            <div style={S.cfgTitle}>Métrica principal</div>
-            <input style={{ ...S.cfgInput, marginBottom: "0.8rem" }} placeholder="ej: Conversiones"
-              value={userContext.mainMetric} onChange={(e) => setUserContext({ ...userContext, mainMetric: e.target.value })} />
-            <div style={{ fontSize: "0.7rem", color: "#666" }}>O selecciona:</div>
-            {["Leads", "Revenue", "Traffic", "Conversiones"].map(opt => (
-              <label key={opt} style={{ display: "block", marginBottom: "0.5rem", cursor: "pointer", fontSize: "0.8rem" }}>
-                <input type="radio" name="metric" checked={userContext.mainMetric === opt} onChange={() => setUserContext({ ...userContext, mainMetric: opt })} />
-                {" " + opt}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div style={S.continueBar}>
-          <span></span>
-          <button
-            style={{ ...S.btnPrimary, opacity: userContext.industry && userContext.stage && userContext.mainMetric ? 1 : 0.5, cursor: userContext.industry ? "pointer" : "not-allowed" }}
-            disabled={!userContext.industry || !userContext.stage || !userContext.mainMetric}
-            onClick={() => { setConfig(prev => ({ ...prev, industry: userContext.industry })); setStep("connect"); fetchStatus(); }}>
-            Siguiente: conecta tus fuentes →
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-
-  // ════════════════════════════════════════════════
   // STEP 1 — CONNECT
   // ════════════════════════════════════════════════
   if (step === "connect") return (
@@ -289,12 +206,11 @@ export default function App() {
         <div style={S.stepDots}>
           <div style={{ ...S.dot, ...S.dotActive }} />
           <div style={S.dot} />
-          <div style={S.dot} />
         </div>
       </div>
 
       <div style={S.content}>
-        <div style={S.eyebrow}>Paso 1 de 3</div>
+        <div style={S.eyebrow}>Paso 1 de 2</div>
         <h1 style={S.h1}>Conectá tus<br /><em style={{ fontStyle: "italic", fontWeight: 300 }}>fuentes de marketing</em></h1>
         <p style={S.desc}>Solo necesitas conectar lo que usas. Cada conexión es segura — tus tokens se guardan localmente, no en nuestros servidores.</p>
 
@@ -491,13 +407,12 @@ export default function App() {
         <span style={S.logo}>MBR<span style={{ color: "#f04b20" }}>.</span></span>
         <div style={S.stepDots}>
           <div style={{ ...S.dot, background: "#18c16a" }} />
-          <div style={{ ...S.dot, background: "#18c16a" }} />
           <div style={{ ...S.dot, ...S.dotActive }} />
         </div>
       </div>
 
       <div style={S.content}>
-        <div style={S.eyebrow}>Paso 2 de 3</div>
+        <div style={S.eyebrow}>Paso 2 de 2</div>
         <h1 style={{ ...S.h1, fontSize: "2rem", marginBottom: "0.4rem" }}>Define tus objetivos y módulos</h1>
         <p style={S.desc}>Ingresá tus North Stars (metas vs. realidad), seleccioná los módulos relevantes, y Claude generará un análisis interpretado.</p>
 
