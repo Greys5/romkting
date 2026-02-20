@@ -37,8 +37,18 @@ const DEFAULT_NORTH_STARS: NorthStar[] = [
 ]
 
 export default function App() {
-  const [step, setStep]           = useState<Step>("context")
-  const [userContext, setUserContext] = useState({ industry: "", stage: "", mainMetric: "" })
+  const [step, setStep]           = useState<Step>(() => {
+    if (typeof window !== "undefined") {
+      return (sessionStorage.getItem("mbr_step") as Step) ?? "context"
+    }
+    return "context"
+  })
+  const [userContext, setUserContext] = useState(() => {
+    if (typeof window !== "undefined") {
+      try { return JSON.parse(sessionStorage.getItem("mbr_ctx") ?? "null") ?? { industry: "", stage: "", mainMetric: "" } } catch { }
+    }
+    return { industry: "", stage: "", mainMetric: "" }
+  })
   const [connected, setConnected] = useState<Record<string, boolean>>({})
   const [loading, setLoading]     = useState(true)
   const [selectedModules, setSelectedModules] = useState<string[]>([])
@@ -59,6 +69,9 @@ export default function App() {
   const [srValidating, setSrValidating] = useState(false)
   const [srError, setSrError]     = useState("")
   const [srPlanInfo, setSrPlanInfo] = useState<SrPlanInfo | null>(null)
+
+  useEffect(() => { sessionStorage.setItem("mbr_step", step) }, [step])
+  useEffect(() => { sessionStorage.setItem("mbr_ctx", JSON.stringify(userContext)) }, [userContext])
 
   const fetchStatus = useCallback(async () => {
     const res = await fetch("/api/auth/status")
