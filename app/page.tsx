@@ -348,7 +348,7 @@ export default function App() {
                   <div style={S.srPanelTitle}>Accesos disponibles — Plan {srPlanInfo.plan}</div>
                   {[
                     { icon: "📊", label: "Keywords & Posicionamiento orgánico", ok: true },
-                    { icon: "🤖", label: "AI Overview & Featured Snippets",      ok: srPlanInfo.hasAiOverview },
+                    { icon: "🤖", label: "Visibilidad en respuestas de búsqueda", ok: srPlanInfo.hasAiOverview },
                     { icon: "⚔️", label: "Análisis de competidores SEO",         ok: true },
                   ].map((f, i) => (
                     <div key={i} style={S.srAccessRow}>
@@ -499,7 +499,7 @@ export default function App() {
               style={{ ...S.btnPrimary, opacity: selectedModules.length === 0 || generating ? 0.4 : 1, cursor: selectedModules.length === 0 ? "not-allowed" : "pointer" }}
               disabled={selectedModules.length === 0 || generating}
               onClick={generateReport}>
-              {generating ? "⟳ Generando reporte…" : "Generar reporte con IA →"}
+              {generating ? "⟳ Generando reporte…" : "Generar reporte →"}
             </button>
             <div style={{ fontFamily: "monospace", fontSize: "0.68rem", color: "#666", textAlign: "center" }}>
               {selectedModules.length === 0 ? "Seleccioná al menos 1 módulo" : `${selectedModules.length} módulos seleccionados`}

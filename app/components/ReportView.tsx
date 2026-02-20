@@ -108,7 +108,7 @@ Luego en nueva línea, solo este JSON sin backticks:
         <div style={{ flex: 1, textAlign: "center" }}>
           <div style={{ fontWeight: 700, fontSize: "0.92rem" }}>{config.reportName || "MBR"}</div>
           <div style={{ fontFamily: "monospace", fontSize: "0.58rem", color: "#666", letterSpacing: "1px" }}>
-            DATOS REALES VÍA OAUTH · INTERPRETACIÓN POR CLAUDE
+            DATOS REALES VÍA OAUTH · ANÁLISIS EJECUTIVO
           </div>
         </div>
         <button onClick={() => window.print()} style={{ background: "#f04b20", border: "none", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem", padding: "8px 18px", borderRadius: 8, cursor: "pointer" }}>
@@ -142,7 +142,7 @@ Luego en nueva línea, solo este JSON sin backticks:
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.8rem" }}>
             <div style={{ fontFamily: "monospace", fontSize: "0.57rem", letterSpacing: "2px", textTransform: "uppercase", background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", padding: "4px 12px", borderRadius: 20 }}>Executive Summary</div>
-            <div style={{ fontFamily: "monospace", fontSize: "0.57rem", letterSpacing: "1px", textTransform: "uppercase", color: "#7eb3ff", background: "rgba(59,114,246,.1)", border: "1px solid rgba(59,114,246,.2)", padding: "4px 10px", borderRadius: 20 }}>✦ Interpretación por Claude</div>
+
           </div>
 
           {/* North Stars */}
@@ -173,10 +173,10 @@ Luego en nueva línea, solo este JSON sin backticks:
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1rem" }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#f04b20", flexShrink: 0 }} />
               <div style={{ fontFamily: "monospace", fontSize: "0.6rem", color: "#666", letterSpacing: "1.5px", textTransform: "uppercase" }}>Nota de interpretación ejecutiva</div>
-              {aiLoading && <div style={{ fontFamily: "monospace", fontSize: "0.58rem", color: "#f04b20", marginLeft: "auto" }}>✦ Generando…</div>}
+              {aiLoading && <div style={{ fontFamily: "monospace", fontSize: "0.58rem", color: "#f04b20", marginLeft: "auto" }}>Analizando…</div>}
             </div>
             <div ref={interpRef} style={{ fontFamily: "'Fraunces', serif", fontStyle: "italic", fontSize: "1.02rem", lineHeight: 1.85, color: "#eceae4" }}>
-              {interpretation || (aiLoading ? <span style={{ color: "#555" }}>Claude está analizando los datos del mes…</span> : "—")}
+              {interpretation || (aiLoading ? <span style={{ color: "#555" }}>Analizando los datos del mes…</span> : "—")}
               {aiLoading && interpretation && <span style={{ display: "inline-block", width: 2, height: "0.9em", background: "#f04b20", marginLeft: 2, animation: "blink .8s infinite", verticalAlign: "text-bottom" }} />}
             </div>
           </div>
@@ -249,7 +249,7 @@ Luego en nueva línea, solo este JSON sin backticks:
 
         <div style={{ textAlign: "center", padding: "2rem 0 3rem", borderTop: "1px solid rgba(255,255,255,.07)", fontFamily: "monospace", fontSize: "0.6rem", color: "#555", letterSpacing: "1px", lineHeight: 1.8 }}>
           MBR MARKETING REPORT · {new Date().toLocaleString("es-AR").toUpperCase()}<br />
-          DATOS REALES VÍA OAUTH SSO · INTERPRETACIÓN EJECUTIVA POR CLAUDE
+          DATOS REALES VÍA OAUTH SSO · ANÁLISIS EJECUTIVO
         </div>
       </div>
 
