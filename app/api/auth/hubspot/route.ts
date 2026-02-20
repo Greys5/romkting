@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     if (!tokenRes.ok) return NextResponse.redirect(`${BASE}/?error=hubspot_token`)
     const { access_token } = await tokenRes.json()
 
-    const res = NextResponse.redirect(`${BASE}/setup`)
+    const res = NextResponse.redirect(`${BASE}/`)
     res.cookies.set("mbr_hubspot_token", access_token, {
       httpOnly: true, secure: process.env.NODE_ENV === "production",
       sameSite: "lax", path: "/", maxAge: 60 * 60 * 8,

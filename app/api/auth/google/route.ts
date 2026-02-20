@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     const { access_token } = await tokenRes.json()
 
     // Store in encrypted httpOnly cookie — never in DB, never logged
-    const res = NextResponse.redirect(`${BASE}/setup`)
+    const res = NextResponse.redirect(`${BASE}/`)
     res.cookies.set("mbr_google_token", access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
