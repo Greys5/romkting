@@ -14,8 +14,8 @@ export async function GET(req: NextRequest) {
   const state = searchParams.get("state")
 
   if (code) {
-    if (!validateOAuthState("hubspot", state ?? ""))
-      return NextResponse.redirect(`${BASE}/?error=hubspot_state`)
+    const errRes = NextResponse.redirect(`${BASE}/?error=hubspot_state`)
+    if (!validateOAuthState("hubspot", state ?? "", errRes)) return errRes
 
     const tokenRes = await fetch("https://api.hubapi.com/oauth/v1/token", {
       method: "POST",
@@ -40,12 +40,16 @@ export async function GET(req: NextRequest) {
     return res
   }
 
-  const oauthState = generateOAuthState("hubspot")
+  const redirectRes = NextResponse.redirect("https://app.hubspot.com") // placeholder
+  const oauthState = generateOAuthState("hubspot", redirectRes)
   const params = new URLSearchParams({
     client_id:     process.env.HUBSPOT_CLIENT_ID,
     redirect_uri:  `${BASE}/api/auth/hubspot`,
     scope:         "crm.objects.contacts.read crm.objects.deals.read marketing-email campaigns",
     state:         oauthState,
   })
-  return NextResponse.redirect(`https://app.hubspot.com/oauth/authorize?${params}`)
+  return NextResponse.redirect(
+    `https://app.hubspot.com/oauth/authorize?${params}`,
+    { headers: redirectRes.headers }
+  )
 }

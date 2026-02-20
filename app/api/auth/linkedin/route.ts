@@ -10,8 +10,9 @@ export async function GET(req: NextRequest) {
   const state = searchParams.get("state")
 
   if (code) {
-    if (!validateOAuthState("linkedin", state ?? ""))
-      return NextResponse.redirect(`${BASE}/?error=linkedin_state`)
+    const errRes = NextResponse.redirect(`${BASE}/?error=linkedin_state`)
+    if (!validateOAuthState("linkedin", state ?? "", errRes))
+      return errRes
 
     const tokenRes = await fetch("https://www.linkedin.com/oauth/v2/accessToken", {
       method: "POST",
@@ -36,7 +37,17 @@ export async function GET(req: NextRequest) {
     return res
   }
 
-  const oauthState = generateOAuthState("linkedin")
+  const res = NextResponse.redirect(
+    `https://www.linkedin.com/oauth/v2/authorization?${new URLSearchParams({
+      response_type: "code",
+      client_id:     process.env.LINKEDIN_CLIENT_ID!.trim(),
+      redirect_uri:  `${BASE}/api/auth/linkedin`,
+      scope:         "openid profile email",
+      state:         "", // will be replaced below
+    })}`
+  )
+  // Build params after creating res so we can attach the state cookie
+  const oauthState = generateOAuthState("linkedin", res)
   const params = new URLSearchParams({
     response_type: "code",
     client_id:     process.env.LINKEDIN_CLIENT_ID!.trim(),
@@ -44,5 +55,8 @@ export async function GET(req: NextRequest) {
     scope:         "openid profile email",
     state:         oauthState,
   })
-  return NextResponse.redirect(`https://www.linkedin.com/oauth/v2/authorization?${params}`)
+  return NextResponse.redirect(
+    `https://www.linkedin.com/oauth/v2/authorization?${params}`,
+    { headers: res.headers }
+  )
 }

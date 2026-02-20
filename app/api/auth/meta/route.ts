@@ -14,8 +14,8 @@ export async function GET(req: NextRequest) {
   const state = searchParams.get("state")
 
   if (code) {
-    if (!validateOAuthState("meta", state ?? ""))
-      return NextResponse.redirect(`${BASE}/?error=meta_state`)
+    const errRes = NextResponse.redirect(`${BASE}/?error=meta_state`)
+    if (!validateOAuthState("meta", state ?? "", errRes)) return errRes
 
     const tokenRes = await fetch(
       `https://graph.facebook.com/v19.0/oauth/access_token?` +
@@ -38,7 +38,8 @@ export async function GET(req: NextRequest) {
     return res
   }
 
-  const oauthState = generateOAuthState("meta")
+  const redirectRes = NextResponse.redirect("https://www.facebook.com") // placeholder
+  const oauthState = generateOAuthState("meta", redirectRes)
   const params = new URLSearchParams({
     client_id:     process.env.META_APP_ID,
     redirect_uri:  `${BASE}/api/auth/meta`,
@@ -46,5 +47,8 @@ export async function GET(req: NextRequest) {
     state:         oauthState,
     response_type: "code",
   })
-  return NextResponse.redirect(`https://www.facebook.com/v19.0/dialog/oauth?${params}`)
+  return NextResponse.redirect(
+    `https://www.facebook.com/v19.0/dialog/oauth?${params}`,
+    { headers: redirectRes.headers }
+  )
 }

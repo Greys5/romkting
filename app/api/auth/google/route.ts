@@ -40,9 +40,8 @@ export async function GET(req: NextRequest) {
   if (code) {
     if (error) return NextResponse.redirect(`${BASE}/?error=google_denied`)
 
-    if (!validateOAuthState("google", state ?? "")) {
-      return NextResponse.redirect(`${BASE}/?error=google_state_mismatch`)
-    }
+    const errRes = NextResponse.redirect(`${BASE}/?error=google_state_mismatch`)
+    if (!validateOAuthState("google", state ?? "", errRes)) return errRes
 
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -56,13 +55,10 @@ export async function GET(req: NextRequest) {
       }),
     })
 
-    if (!tokenRes.ok) {
-      return NextResponse.redirect(`${BASE}/?error=google_token_failed`)
-    }
+    if (!tokenRes.ok) return NextResponse.redirect(`${BASE}/?error=google_token_failed`)
 
     const { access_token } = await tokenRes.json()
 
-    // Store in encrypted httpOnly cookie — never in DB, never logged
     const res = NextResponse.redirect(`${BASE}/`)
     res.cookies.set("mbr_google_token", access_token, {
       httpOnly: true,
@@ -75,8 +71,9 @@ export async function GET(req: NextRequest) {
   }
 
   // ── Initiate OAuth flow ───────────────────────────────────────────────────
-  const oauthState = generateOAuthState("google")
   const scopes = SCOPE_MAP[scope] ?? SCOPE_MAP["all"]
+  const redirectRes = NextResponse.redirect("https://accounts.google.com") // placeholder
+  const oauthState = generateOAuthState("google", redirectRes)
 
   const params = new URLSearchParams({
     response_type: "code",
@@ -84,11 +81,12 @@ export async function GET(req: NextRequest) {
     redirect_uri:  `${BASE}/api/auth/google`,
     scope:         scopes.join(" "),
     state:         oauthState,
-    access_type:   "online",  // no refresh token — fresh each session
+    access_type:   "online",
     prompt:        "select_account",
   })
 
   return NextResponse.redirect(
-    `https://accounts.google.com/o/oauth2/v2/auth?${params}`
+    `https://accounts.google.com/o/oauth2/v2/auth?${params}`,
+    { headers: redirectRes.headers }
   )
 }
