@@ -452,10 +452,14 @@ export default function App() {
             <div style={S.cfgCard}>
               <div style={S.cfgTitle}>Info del reporte</div>
               {[
-                { label: "Nombre del reporte", key: "reportName", placeholder: "MBR Enero 2026" },
-                { label: "Empresa",            key: "company",    placeholder: "Tu empresa" },
-                { label: "Industria/contexto", key: "industry",   placeholder: "ej: SaaS EdTech B2B" },
-                { label: "Dominio (Semrush)",  key: "domain",     placeholder: "tuempresa.com" },
+                { label: "Nombre del reporte",   key: "reportName",  placeholder: "MBR Enero 2026" },
+                { label: "Empresa",              key: "company",     placeholder: "Tu empresa" },
+                { label: "Industria/contexto",   key: "industry",    placeholder: "ej: SaaS EdTech B2B" },
+                { label: "Dominio",              key: "domain",      placeholder: "tuempresa.com" },
+                ...(connected.google_search_console ? [{ label: "URL en Search Console", key: "gscSiteUrl", placeholder: "https://tuempresa.com/ o sc-domain:tuempresa.com" }] : []),
+                ...(connected.google_analytics    ? [{ label: "GA4 Property ID",         key: "ga4PropertyId", placeholder: "123456789" }] : []),
+                ...(connected.linkedin            ? [{ label: "LinkedIn Org ID",          key: "linkedinOrgId", placeholder: "123456" }] : []),
+                ...(connected.meta_ads            ? [{ label: "Meta Ad Account ID",       key: "metaAdAccountId", placeholder: "act_123456789" }] : []),
               ].map(f => (
                 <div key={f.key} style={{ marginBottom: "0.7rem" }}>
                   <label style={S.cfgLabel}>{f.label}</label>

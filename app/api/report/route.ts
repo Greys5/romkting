@@ -14,7 +14,8 @@ export async function POST(req: NextRequest) {
   const googleToken = cookies.get("mbr_google_token")?.value
   if (googleToken && modules.some((m: string) => m.startsWith("gsc_"))) {
     try {
-      const site = config.gscSiteUrl || `sc-domain:${config.domain}`
+      const site = config.gscSiteUrl || (config.domain ? `sc-domain:${config.domain}` : null)
+      if (!site) throw new Error("Configurá el campo 'URL en GSC' o 'Dominio' en el paso anterior.")
       const body = {
         startDate: thirtyDaysAgo(),
         endDate:   today(),
@@ -26,6 +27,7 @@ export async function POST(req: NextRequest) {
         { method: "POST", headers: { Authorization: `Bearer ${googleToken}`, "Content-Type": "application/json" }, body: JSON.stringify(body) }
       )
       const d = await res.json()
+      if (!res.ok) throw new Error(`GSC API error ${res.status}: ${JSON.stringify(d)}`)
       const rows = d.rows ?? []
 
       const totalClicks = rows.reduce((s: number, r: any) => s + r.clicks, 0)
@@ -53,8 +55,8 @@ export async function POST(req: NextRequest) {
           ]),
         } : undefined,
       })
-    } catch (e) {
-      sections.push({ title: "Search Console", source: "Google Search Console", error: "No se pudieron obtener los datos. Verificá los permisos." })
+    } catch (e: any) {
+      sections.push({ title: "Search Console", source: "Google Search Console", error: e.message || "No se pudieron obtener los datos." })
     }
   }
 
