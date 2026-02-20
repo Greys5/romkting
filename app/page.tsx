@@ -8,7 +8,7 @@ import { useEffect, useState, useRef, useCallback } from "react"
 import { SOURCES, Source, SourceId } from "@/lib/sources"
 import ReportView from "@/app/components/ReportView"
 
-type Step = "connect" | "configure" | "report"
+type Step = "context" | "connect" | "configure" | "report"
 
 interface NorthStar { label: string; goal: string; real: string }
 
@@ -30,14 +30,15 @@ type SrStep = 1 | 2 | 3
 interface SrPlanInfo { plan: string; hasAiOverview: boolean }
 
 const DEFAULT_NORTH_STARS: NorthStar[] = [
-  { label: "Leads calificados", goal: "", real: "" },
-  { label: "Brand Positioning", goal: "", real: "" },
-  { label: "CR Lead→Deal",      goal: "", real: "" },
-  { label: "AI Overview aparic.", goal: "", real: "" },
+  { label: "", goal: "", real: "" },
+  { label: "", goal: "", real: "" },
+  { label: "", goal: "", real: "" },
+  { label: "", goal: "", real: "" },
 ]
 
 export default function App() {
-  const [step, setStep]           = useState<Step>("connect")
+  const [step, setStep]           = useState<Step>("context")
+  const [userContext, setUserContext] = useState({ industry: "", stage: "", mainMetric: "" })
   const [connected, setConnected] = useState<Record<string, boolean>>({})
   const [loading, setLoading]     = useState(true)
   const [selectedModules, setSelectedModules] = useState<string[]>([])
@@ -170,6 +171,77 @@ export default function App() {
   )
 
   // ════════════════════════════════════════════════
+  // STEP 0 — CONTEXTO
+  // ════════════════════════════════════════════════
+  if (step === "context") return (
+    <div style={S.page}>
+      <div style={S.topbar}>
+        <span style={S.logo}>MBR<span style={{ color: "#f04b20" }}>.</span></span>
+        <div style={S.stepDots}>
+          <div style={{ ...S.dot, ...S.dotActive }} />
+          <div style={S.dot} />
+          <div style={S.dot} />
+          <div style={S.dot} />
+        </div>
+      </div>
+
+      <div style={S.content}>
+        <div style={S.eyebrow}>Tu contexto</div>
+        <h1 style={S.h1}>¿Sobre qué querés que te interprete?</h1>
+        <p style={S.desc}>Esto ayuda a Claude a contextualizar el análisis de tu industria y objetivos.</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem", margin: "3rem 0", maxWidth: "900px" }}>
+          {/* Industria */}
+          <div style={{ ...S.cfgCard, cursor: "pointer" }} onClick={() => setUserContext({ ...userContext, industry: "B2B SaaS" })}>
+            <div style={S.cfgTitle}>Industria</div>
+            <div style={{ marginBottom: "1rem", fontSize: "2rem" }}>🏢</div>
+            {["B2B SaaS", "E-commerce", "Agencia", "B2C"].map(opt => (
+              <label key={opt} style={{ display: "block", marginBottom: "0.6rem", cursor: "pointer", fontSize: "0.85rem" }}>
+                <input type="radio" name="industry" checked={userContext.industry === opt} onChange={() => setUserContext({ ...userContext, industry: opt })} />
+                {" " + opt}
+              </label>
+            ))}
+          </div>
+
+          {/* Etapa */}
+          <div style={S.cfgCard}>
+            <div style={S.cfgTitle}>Etapa</div>
+            <div style={{ marginBottom: "1rem", fontSize: "2rem" }}>📈</div>
+            {["Early Stage", "Growth", "Scale"].map(opt => (
+              <label key={opt} style={{ display: "block", marginBottom: "0.6rem", cursor: "pointer", fontSize: "0.85rem" }}>
+                <input type="radio" name="stage" checked={userContext.stage === opt} onChange={() => setUserContext({ ...userContext, stage: opt })} />
+                {" " + opt}
+              </label>
+            ))}
+          </div>
+
+          {/* Métrica principal */}
+          <div style={S.cfgCard}>
+            <div style={S.cfgTitle}>Métrica principal</div>
+            <div style={{ marginBottom: "1rem", fontSize: "2rem" }}>🎯</div>
+            {["Leads", "Revenue", "Traffic", "Conversiones"].map(opt => (
+              <label key={opt} style={{ display: "block", marginBottom: "0.6rem", cursor: "pointer", fontSize: "0.85rem" }}>
+                <input type="radio" name="metric" checked={userContext.mainMetric === opt} onChange={() => setUserContext({ ...userContext, mainMetric: opt })} />
+                {" " + opt}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div style={S.continueBar}>
+          <span></span>
+          <button
+            style={{ ...S.btnPrimary, opacity: userContext.industry && userContext.stage && userContext.mainMetric ? 1 : 0.5, cursor: userContext.industry ? "pointer" : "not-allowed" }}
+            disabled={!userContext.industry || !userContext.stage || !userContext.mainMetric}
+            onClick={() => { setConfig(prev => ({ ...prev, industry: userContext.industry })); setStep("connect"); fetchStatus(); }}>
+            Siguiente: conecta tus fuentes →
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  // ════════════════════════════════════════════════
   // STEP 1 — CONNECT
   // ════════════════════════════════════════════════
   if (step === "connect") return (
@@ -186,8 +258,8 @@ export default function App() {
 
       <div style={S.content}>
         <div style={S.eyebrow}>Paso 1 de 3</div>
-        <h1 style={S.h1}>Conectá tus<br /><em style={{ fontStyle: "italic", fontWeight: 300 }}>fuentes de datos</em></h1>
-        <p style={S.desc}>Login SSO con cada plataforma. Para Semrush ingresás tu API key personal — sin registro ni costo extra.</p>
+        <h1 style={S.h1}>Conectá tus<br /><em style={{ fontStyle: "italic", fontWeight: 300 }}>fuentes de marketing</em></h1>
+        <p style={S.desc}>Solo necesitas conectar lo que usas. Cada conexión es segura — tus tokens se guardan localmente, no en nuestros servidores.</p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", margin: "2rem 0" }}>
           {SOURCES.map(source => {
@@ -382,15 +454,15 @@ export default function App() {
         <span style={S.logo}>MBR<span style={{ color: "#f04b20" }}>.</span></span>
         <div style={S.stepDots}>
           <div style={{ ...S.dot, background: "#18c16a" }} />
+          <div style={{ ...S.dot, background: "#18c16a" }} />
           <div style={{ ...S.dot, ...S.dotActive }} />
-          <div style={S.dot} />
         </div>
       </div>
 
       <div style={S.content}>
         <div style={S.eyebrow}>Paso 2 de 3</div>
-        <h1 style={{ ...S.h1, fontSize: "2rem", marginBottom: "0.4rem" }}>Armá tu reporte</h1>
-        <p style={S.desc}>Elegí módulos, ingresá tus North Stars y Claude generará la interpretación ejecutiva.</p>
+        <h1 style={{ ...S.h1, fontSize: "2rem", marginBottom: "0.4rem" }}>Define tus objetivos y módulos</h1>
+        <p style={S.desc}>Ingresá tus North Stars (metas vs. realidad), seleccioná los módulos relevantes, y Claude generará un análisis interpretado.</p>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "2.5rem", marginTop: "2rem" }}>
 
